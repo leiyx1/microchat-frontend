@@ -10,15 +10,6 @@ export default function Login() {
                 <div className={cn("flex flex-col gap-6", className)}>
                     <div className="flex flex-col gap-6">
                         <div className="flex flex-col items-center gap-2">
-                            <a
-                                href="#"
-                                className="flex flex-col items-center gap-2 font-medium"
-                            >
-                                <div className="flex h-8 w-8 items-center justify-center rounded-md">
-                                    <GalleryVerticalEnd className="size-6"/>
-                                </div>
-                                <span className="sr-only">Acme Inc.</span>
-                            </a>
                             <h1 className="text-xl font-bold">Welcome to MicroChat.</h1>
                             <span className="relative z-10 bg-background px-2 text-muted-foreground">
                             Developed by Yuxuan Lei
@@ -30,9 +21,8 @@ export default function Login() {
                             </div>
                         </div>
                         <div
-                            className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary  ">
-                        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-                        and <a href="#">Privacy Policy</a>.
+                            className="text-balance text-center text-sm text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary  ">
+                            You can play around with this demo using three pre-created accounts: user, user1, and user2 as both the username and password. 
                     </div>
                 </div>
             </div>

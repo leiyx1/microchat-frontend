@@ -3,7 +3,6 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {useSession} from "next-auth/react";
 import {Message} from "@/lib/types";
-import { fetcher } from "@/lib/utils";
 
 type ChatContext = {
     messages: Record<string, Message[]>;

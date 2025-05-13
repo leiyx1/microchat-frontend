@@ -13,7 +13,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
-import type { Chat } from '@/lib/types';
 import { fetcher } from '@/lib/utils';
 
 interface Conversation {

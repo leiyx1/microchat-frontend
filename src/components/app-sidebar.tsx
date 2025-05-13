@@ -17,7 +17,6 @@ import {
 import {NavItem} from "@/components/nav-item";
 import {SidebarFriends} from "@/components/sidebar-friends";
 import {useSelectedLayoutSegment} from "next/navigation";
-import {SignOut} from "@/components/SignOut";
 import {SidebarChats} from "@/components/sidebar-chats";
 import {NavUser} from "@/components/nav-user";
 

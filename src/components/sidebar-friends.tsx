@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useParams, usePathname} from 'next/navigation';
 import {Avatar, AvatarImage, AvatarFallback} from "@/components/ui/avatar";
 import { memo, useEffect} from 'react';
@@ -16,12 +15,9 @@ import {
 } from '@/components/ui/sidebar';
 import { fetcher } from '@/lib/utils';
 import {Friend} from "@/lib/types";
-import {ChevronsUpDown} from "lucide-react";
 
 const PureFriendItem = ({
   friend,
-  isActive,
-  setOpenMobile,
 }: {
   friend: Friend;
   isActive: boolean;

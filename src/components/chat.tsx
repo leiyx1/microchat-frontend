@@ -58,12 +58,15 @@ export function Chat({
   const [ input, setInput ] = useState<string>("")
 
   useEffect(() => {
-    // Load initial messages when component mounts
-    loadMessages(id).catch(console.error);
+    // Only load messages if we don't have any for this conversation
+    if (!messages[id]?.length) {
+      loadMessages(id).catch(console.error);
+    }
   }, [id, loadMessages]);
 
   const handleSubmit = () => {
-    const message : Message = { 
+    const message : Message = {
+      sender: "",
       receiver: id, 
       content: input,
       messageId: Date.now(), // Temporary ID for new messages

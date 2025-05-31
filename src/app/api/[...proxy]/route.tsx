@@ -23,7 +23,12 @@ async function handler(request: NextRequest) {
     const url = request.nextUrl.href.replace(`${request.nextUrl.origin}/api`, backendUrl ?? request.nextUrl.origin)
     const result = await fetch(url, { headers, body: request.body })
 
-    return stripContentEncoding(result)
+    // Only strip content encoding in production
+    if (process.env.NODE_ENV === 'production') {
+        return stripContentEncoding(result)
+    }
+    
+    return result
 }
 
 export const dynamic = "force-dynamic"

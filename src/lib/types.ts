@@ -1,7 +1,7 @@
 export interface Message {
     messageId: number;
     id?: string;
-    sender?: string;
+    sender: string;
     receiver: string;
     content: string;
     createdAt: string;
@@ -15,6 +15,7 @@ export interface Message {
 export interface Friend {
     id: string;
     username: string;
+    fullName: string;
 }
 
 export interface Chat {

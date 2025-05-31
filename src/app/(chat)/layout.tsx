@@ -17,18 +17,18 @@ export default function Layout({
     const router = useRouter();
     const { data: session, status: authenticationStatus} = useSession();
     useEffect(() => {
-                if (authenticationStatus === 'unauthenticated' || !!session?.error)
+        if (authenticationStatus === 'unauthenticated' || !!session?.error)
             router.push("/login");
     })
 
     return (
         <SidebarProvider style={{"--sidebar-width": "350px",} as React.CSSProperties}>
-            <AppSidebar/>
-            <SidebarInset>
-                <ChatProvider>
+            <ChatProvider>
+                <AppSidebar/>
+                <SidebarInset>
                     {children}
-                </ChatProvider>
-            </SidebarInset>
+                </SidebarInset>
+            </ChatProvider>
         </SidebarProvider>
     )
 }

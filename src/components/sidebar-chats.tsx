@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useParams, usePathname} from 'next/navigation';
 import { memo, useEffect} from 'react';
-import useSWR from 'swr';
+import { useChat } from "@/app/(chat)/chat-provider";
 
 import {
   SidebarGroup,
@@ -13,7 +13,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { fetcher } from '@/lib/utils';
 
 interface Conversation {
   friendUsername: string;
@@ -42,7 +41,13 @@ const PureChatItem = ({
 }) => {
   const displayName = chat.friendFullName || chat.friendUsername;
   const messageDate = new Date(chat.latestMessage.createdAt);
-  const formattedDate = messageDate.toLocaleDateString();
+  const today = new Date();
+  const isToday = messageDate.toDateString() === today.toDateString();
+  
+  const formattedDate = isToday 
+    ? messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    : messageDate.toLocaleDateString();
+
   const isCurrentUser = chat.latestMessage.sender === 'user';
   const messagePreview = isCurrentUser 
     ? `You: ${chat.latestMessage.content}`
@@ -83,48 +88,21 @@ export const ChatItem = memo(PureChatItem, (prevProps, nextProps) => {
   return true;
 });
 
-// export function SidebarHistory({ user }: { user: User | undefined }) {
 export function SidebarChats() {
   const { setOpenMobile } = useSidebar();
   const { id } = useParams();
   const pathname = usePathname();
-  const {
-    data: conversations,
-    isLoading,
-    mutate,
-  } = useSWR<Array<Conversation>>('/api/conversations', fetcher, {
-    fallbackData: [],
-  });
+  const { conversations, loadConversations, markConversationAsRead } = useChat();
 
   useEffect(() => {
-    mutate();
-  }, [pathname, mutate]);
+      loadConversations().catch(console.error);
+  }, [loadConversations]);
 
-  if (isLoading) {
-    return (
-      <SidebarGroup>
-        <SidebarGroupContent>
-          <div className="flex flex-col">
-            {[44, 32, 28, 64, 52].map((item) => (
-              <div
-                key={item}
-                className="rounded-md h-8 flex gap-2 px-2 items-center"
-              >
-                <div
-                  className="h-4 rounded-md flex-1 max-w-[--skeleton-width] bg-sidebar-accent-foreground/10"
-                  style={
-                    {
-                      '--skeleton-width': `${item}%`,
-                    } as React.CSSProperties
-                  }
-                />
-              </div>
-            ))}
-          </div>
-        </SidebarGroupContent>
-      </SidebarGroup>
-    );
-  }
+  useEffect(() => {
+    if (id) {
+      markConversationAsRead(id as string);
+    }
+  }, [id, markConversationAsRead]);
 
   if (!conversations || conversations.length === 0) {
     return (
@@ -147,7 +125,7 @@ export function SidebarChats() {
               <ChatItem
                 key={chat.friendUsername}
                 chat={chat}
-                isActive={chat.friendUsername === id}
+                isActive={pathname === `/chats/${chat.friendUsername}`}
                 setOpenMobile={setOpenMobile}
               />
             ))}

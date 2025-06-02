@@ -13,8 +13,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { fetcher } from '@/lib/utils';
+import {fetcher, getInitials} from '@/lib/utils';
 import {Friend} from "@/lib/types";
+import {DialogNewFriend} from "@/components/dialog-add-friend";
 
 const PureFriendItem = ({
   friend,
@@ -31,11 +32,11 @@ const PureFriendItem = ({
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground md:h-8 md:p-0"
       >
         <Avatar className="h-8 w-8 rounded-lg">
-          <AvatarImage src="https://microchat-bucket.s3.ca-central-1.amazonaws.com/913c4bc3245718481cebd8a456e8753d.jpg"/>
-          <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+          <AvatarImage src={friend.avatarUrl}/>
+          <AvatarFallback className="rounded-lg">{getInitials(friend.fullName)}</AvatarFallback>
         </Avatar>
         <div className="grid flex-1 text-left text-sm leading-tight">
-          <span className="truncate font-semibold">{friend.username}</span>
+          <span className="truncate font-semibold">{friend.fullName}</span>
           <span className="truncate text-xs">{friend.username}</span>
         </div>
       </SidebarMenuButton>
@@ -48,7 +49,7 @@ export const FriendItem = memo(PureFriendItem, (prevProps, nextProps) => {
   return true;
 });
 
-export function SidebarFriends() {
+export function SidebarFriends({ open, setOpen }: { open: boolean; setOpen: (open: boolean) => void }) {
   const { setOpenMobile } = useSidebar();
   const { id } = useParams();
   const pathname = usePathname();
@@ -92,13 +93,18 @@ export function SidebarFriends() {
 
   if (friends?.length === 0) {
     return (
-      <SidebarGroup>
-        <SidebarGroupContent>
-          <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
-            Add a friend to start chatting!
-          </div>
-        </SidebarGroupContent>
-      </SidebarGroup>
+      <>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
+              Add a friend to start chatting!
+            </div>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <DialogNewFriend open={open} setOpen={setOpen}>
+        </DialogNewFriend>
+      </>
     );
   }
 
@@ -118,6 +124,9 @@ export function SidebarFriends() {
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
+
+      <DialogNewFriend open={open} setOpen={setOpen}>
+      </DialogNewFriend>
     </>
   );
 }

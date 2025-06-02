@@ -16,6 +16,7 @@ export interface Friend {
     id: string;
     username: string;
     fullName: string;
+    avatarUrl?: string;
 }
 
 export interface Chat {

@@ -27,10 +27,10 @@ async function handler(request: NextRequest) {
     if (process.env.NODE_ENV === 'production') {
         return stripContentEncoding(result)
     }
-    
+
     return result
 }
 
 export const dynamic = "force-dynamic"
 
-export { handler as GET, handler as POST }
+export { handler as GET, handler as POST, handler as PUT, handler as DELETE, handler as PATCH }

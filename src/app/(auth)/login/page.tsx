@@ -1,5 +1,4 @@
 import SignIn from "@/components/SignIn";
-import {GalleryVerticalEnd} from "lucide-react";
 import {className} from "postcss-selector-parser";
 import {cn} from "@/lib/utils";
 

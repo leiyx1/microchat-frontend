@@ -13,6 +13,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+import {DialogNewChat} from "@/components/dialog-new-chat";
 
 interface Conversation {
   friendUsername: string;
@@ -88,7 +89,7 @@ export const ChatItem = memo(PureChatItem, (prevProps, nextProps) => {
   return true;
 });
 
-export function SidebarChats() {
+export function SidebarChats({ open, setOpen }: { open: boolean; setOpen: (open: boolean) => void }) {
   const { setOpenMobile } = useSidebar();
   const { id } = useParams();
   const pathname = usePathname();
@@ -106,13 +107,17 @@ export function SidebarChats() {
 
   if (!conversations || conversations.length === 0) {
     return (
+      <>
       <SidebarGroup>
-        <SidebarGroupContent>
-          <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
-            Your conversations will appear here once you start chatting!
-          </div>
-        </SidebarGroupContent>
-      </SidebarGroup>
+          <SidebarGroupContent>
+            <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
+              Your conversations will appear here once you start chatting!
+            </div>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <DialogNewChat open={open} setOpen={setOpen}>
+        </DialogNewChat>
+      </>
     );
   }
 
@@ -132,6 +137,8 @@ export function SidebarChats() {
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
+      <DialogNewChat open={open} setOpen={setOpen}>
+      </DialogNewChat>
     </>
   );
 }

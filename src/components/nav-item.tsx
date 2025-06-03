@@ -1,6 +1,6 @@
 'use client';
 
-import { SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar"
+import { SidebarMenuItem, SidebarMenuButton, useSidebar } from "@/components/ui/sidebar"
 import {useRouter, useSelectedLayoutSegment} from "next/navigation";
 
 export function NavItem({
@@ -13,7 +13,8 @@ export function NavItem({
   children: React.ReactNode
 }) {
   const router = useRouter();
-  const segment = useSelectedLayoutSegment()
+  const segment = useSelectedLayoutSegment();
+  const { isMobile, setOpenMobile } = useSidebar();
     
   return (
     <SidebarMenuItem key={label}>
@@ -22,7 +23,12 @@ export function NavItem({
           children: label,
           hidden: false,
         }}
-        onClick={() => {router.push(href)}}
+        onClick={() => {
+          router.push(href);
+          if (isMobile) {
+            setOpenMobile(false);
+          }
+        }}
         isActive={href === `/${segment}`}
         className="px-2.5 md:px-2"
       >

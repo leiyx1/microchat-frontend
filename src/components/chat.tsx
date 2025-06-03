@@ -1,7 +1,7 @@
 'use client';
 
 // import type { Attachment, Message } from 'ai';
-import type { Message } from '@/lib/types'
+import {Friend, Message} from '@/lib/types'
 // import { useChat } from 'ai/react';
 // import { useState } from 'react';
 // import useSWR, { useSWRConfig } from 'swr';
@@ -16,6 +16,9 @@ import {useChat} from "@/app/(chat)/chat-provider";
 import {useState, useEffect} from "react";
 import {MultimodalInput} from "@/components/multimodal-input";
 import {Messages} from "@/components/messages";
+import {ChatHeader} from "@/components/chat-header";
+import useSWR from "swr";
+import {fetcher} from "@/lib/utils";
 // import { VisibilityType } from './visibility-selector';
 // import { useBlockSelector } from '@/hooks/use-block';
 
@@ -54,8 +57,16 @@ export function Chat({
   //   },
   // });
 
-  const { messages, sendMessage, loadMessages } = useChat()
+  const { messages, sendMessage, loadMessages, isConnected } = useChat()
   const [ input, setInput ] = useState<string>("")
+
+  const {
+    data: users,
+    // error,
+    // isLoading
+  } = useSWR<Array<Friend>>(
+      `/api/users/${encodeURIComponent(id)}`, fetcher,
+  );
 
   useEffect(() => {
     // Only load messages if we don't have any for this conversation
@@ -79,12 +90,7 @@ export function Chat({
   return (
     <>
       <div className="flex flex-col min-w-0 h-dvh bg-background">
-        {/*<ChatHeader*/}
-        {/*  chatId={id}*/}
-        {/*  selectedModelId={selectedModelId}*/}
-        {/*  selectedVisibilityType={selectedVisibilityType}*/}
-        {/*  isReadonly={isReadonly}*/}
-        {/*/>*/}
+        <ChatHeader name={users ? users[0].fullName : ""} isConnected={isConnected}/>
 
         <Messages
           isLoading={false}
@@ -99,6 +105,7 @@ export function Chat({
               setInput={setInput}
               handleSubmit={handleSubmit}
               isLoading={false}
+              disabledSend={!isConnected}
               // stop={stop}
               // attachments={attachments}
               // setAttachments={setAttachments}

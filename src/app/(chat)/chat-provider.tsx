@@ -21,6 +21,7 @@ interface Conversation {
 }
 
 type ChatContext = {
+    isConnected: boolean;
     messages: Record<string, Message[]>;
     conversations: Conversation[];
     sendMessage: (message: Message) => void;
@@ -35,6 +36,8 @@ type MessagesState = Record<string, Message[]>;
 
 export function ChatProvider({children}: { children: React.ReactNode }) {
     const [socket, setSocket] = useState<WebSocket | undefined>(undefined);
+    const [isConnected, setIsConnected] = useState(false);
+    const [waitingToReconnect, setWaitingToReconnect] = useState<boolean>(false);
     const [messages, setMessages] = useState<MessagesState>({});
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [messagesLoaded, setMessagesLoaded] = useState<Set<string>>(new Set());
@@ -103,12 +106,16 @@ export function ChatProvider({children}: { children: React.ReactNode }) {
     /* ---------------- WebSocket Connection -------------- */
 
     useEffect(() => {
+        if (waitingToReconnect) {
+            return;
+        }
         if (!session) return;
 
         const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL}?token=${session.accessToken}`);
 
         ws.onopen = () => {
-            console.log("WebSocket connection opened");
+            console.log('WebSocket connection opened');
+            setIsConnected(true);
         };
 
         ws.onmessage = (event) => {
@@ -118,12 +125,22 @@ export function ChatProvider({children}: { children: React.ReactNode }) {
         };
 
         ws.onclose = () => {
-            console.log("WebSocket connection opened");
+            console.log('WebSocket connection closed');
+            if (waitingToReconnect) {
+                return;
+            };
+
+            setIsConnected(false);
+
+            setWaitingToReconnect(true);
+            setTimeout(() => setWaitingToReconnect(false), 5000);
         };
 
         setSocket(ws);
-        return () => ws.close();
-    }, [session?.user]);
+        return () => {
+            ws.close();
+        }
+    }, [session?.accessToken, waitingToReconnect]);
 
     const sendMessage = (message: Message) => {
         if (socket) {
@@ -184,12 +201,13 @@ export function ChatProvider({children}: { children: React.ReactNode }) {
 
     return (
         <ChatContext.Provider value={{
-            messages, 
+            isConnected,
+            messages,
             conversations,
             sendMessage, 
             loadMessages,
             loadConversations,
-            markConversationAsRead
+            markConversationAsRead,
         }}>
             {children}
         </ChatContext.Provider>

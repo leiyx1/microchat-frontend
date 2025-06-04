@@ -16,15 +16,20 @@ export default function Login() {
                         </div>
 
                         <div className="flex flex-col items-center gap-2">
-                                <SignIn/>
-                            </div>
+                            <SignIn/>
                         </div>
-                        <div
-                            className="text-balance text-center text-sm text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary  ">
-                            You can play around with this demo using three pre-created accounts: user, user1, and user2 as both the username and password. 
+                    </div>
+                    <div
+                        className="text-balance text-center text-sm text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary  ">
+                        You can play around with this demo using three pre-created accounts: user, user1, and user2 as
+                        both the username and password.
+                    </div>
+                    <div
+                        className="text-balance text-center text-sm text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary  ">
+                        Chrome may flag this site as malicious during the redirect after successful authentication. I&#39;m trying to find out the cause. Other browsers don&#39;t seem to have this issue.
                     </div>
                 </div>
             </div>
         </div>
-                )
-                }
+    )
+}

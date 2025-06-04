@@ -44,19 +44,21 @@ export function ChatHeader({
                 {name ? (
                     <>
                         <div className="font-semibold">{name}</div>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <div className={cn(
-                                        "h-2 w-2 rounded-full",
-                                        isConnected ? "bg-green-500" : "bg-yellow-500 animate-pulse"
-                                    )} />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>{isConnected ? "Connected" : "Trying to reconnect..."}</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                        {isSpecificChat && (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <div className={cn(
+                                            "h-2 w-2 rounded-full",
+                                            isConnected ? "bg-green-500" : "bg-yellow-500 animate-pulse"
+                                        )} />
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{isConnected ? "Connected" : "Trying to reconnect..."}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
                     </>
                 ) : isMobile && !isSpecificChat ? (
                     <div className="font-semibold text-lg">MicroChat</div>

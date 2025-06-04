@@ -75,12 +75,10 @@ export function DialogNewFriend({open, setOpen}: { open: boolean; setOpen: (open
             toast.error('Failed to send friend request');
         } else {
             toast.success(`Friend request sent to ${selectedUser.fullName}`);
-            // Clear the form after successful request
-            setSearch('');
-            setSelectedUser(null);
-            // Close the dialog after a short delay
             setTimeout(() => {
                 setOpen(false);
+                setSelectedUser(null);
+                setSearch('');
             }, 1000);
         }
     };

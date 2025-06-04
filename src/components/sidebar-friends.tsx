@@ -7,7 +7,7 @@ import useSWR from 'swr';
 
 import {
   SidebarGroup,
-  SidebarGroupContent,
+  SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -16,6 +16,19 @@ import {
 import {fetcher, getInitials} from '@/lib/utils';
 import {Friend} from "@/lib/types";
 import {DialogNewFriend} from "@/components/dialog-add-friend";
+import {Button} from "@/components/ui/button";
+import {useSession} from "next-auth/react";
+import {toast} from "sonner";
+
+interface FriendRequest {
+    id: string;
+    senderUsername: string;
+    senderFullName: string;
+    receiverUsername: string;
+    receiverFullName: string;
+    status: "PENDING" | "APPROVED";
+    createdDate: string;
+}
 
 const PureFriendItem = ({
   friend,
@@ -49,23 +62,116 @@ export const FriendItem = memo(PureFriendItem, (prevProps, nextProps) => {
   return true;
 });
 
+const PureFriendRequestItem = ({
+  request,
+  onAccept,
+  onDelete,
+}: {
+  request: FriendRequest;
+  onAccept: (id: string) => void;
+  onDelete: (id: string) => void;
+}) => {
+  return (
+    <SidebarMenuItem>
+      <div className="flex items-center gap-2 p-2">
+        <Avatar className="h-8 w-8 rounded-lg">
+          <AvatarFallback className="rounded-lg">{getInitials(request.senderFullName)}</AvatarFallback>
+        </Avatar>
+        <div className="grid flex-1 text-left text-sm leading-tight">
+          <span className="truncate font-semibold">{request.senderFullName}</span>
+          <span className="truncate text-xs">{request.senderUsername}</span>
+        </div>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={(e) => {
+              e.stopPropagation();
+              onAccept(request.id);
+            }}
+          >
+            Accept
+          </Button>
+          <Button 
+            variant="destructive" 
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(request.id);
+            }}
+          >
+            Delete
+          </Button>
+        </div>
+      </div>
+    </SidebarMenuItem>
+  );
+};
+
+export const FriendRequestItem = memo(PureFriendRequestItem);
+
 export function SidebarFriends({ open, setOpen }: { open: boolean; setOpen: (open: boolean) => void }) {
   const { setOpenMobile } = useSidebar();
   const { id } = useParams();
   const pathname = usePathname();
+  const { data: session } = useSession();
   const {
     data: friends,
-    isLoading,
-    mutate,
+    isLoading: isLoadingFriends,
+    mutate: mutateFriends,
   } = useSWR<Array<Friend>>('/api/friends', fetcher, {
     fallbackData: [],
   });
 
-  useEffect(() => {
-    mutate();
-  }, [pathname, mutate]);
+  const {
+    data: requests,
+    isLoading: isLoadingRequests,
+    mutate: mutateRequests,
+  } = useSWR<Array<FriendRequest>>('/api/friend_requests', fetcher, {
+    fallbackData: [],
+  });
 
-  if (isLoading) {
+  useEffect(() => {
+    mutateFriends();
+    mutateRequests();
+  }, [pathname, mutateFriends, mutateRequests]);
+
+  const handleAcceptRequest = async (requestId: string) => {
+    try {
+      const response = await fetch(`/api/friend_requests/${requestId}`, {
+        method: 'PATCH'
+      });
+      if (!response.ok)
+        throw Error();
+      toast.success("Friend request accepted");
+      mutateRequests();
+      mutateFriends();
+    } catch {
+      toast.error("Error accepting friend request");
+    }
+  };
+
+  const handleDeleteRequest = async (requestId: string) => {
+    try {
+      const response = await fetch(`/api/friend_requests/${requestId}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok)
+        throw Error();
+      toast.success("Friend request deleted");
+      mutateRequests();
+    } catch {
+      toast.error('Error deleting friend request');
+    }
+  };
+
+  const pendingRequests = requests?.filter(
+    request => 
+      request.status === "PENDING" && 
+      request.receiverUsername === session?.user?.preferred_username
+  ) || [];
+
+  if (isLoadingFriends || isLoadingRequests) {
     return (
       <SidebarGroup>
         <SidebarGroupContent>
@@ -91,7 +197,7 @@ export function SidebarFriends({ open, setOpen }: { open: boolean; setOpen: (ope
     );
   }
 
-  if (friends?.length === 0) {
+  if (friends?.length === 0 && pendingRequests.length === 0) {
     return (
       <>
         <SidebarGroup>
@@ -110,7 +216,26 @@ export function SidebarFriends({ open, setOpen }: { open: boolean; setOpen: (ope
 
   return (
     <>
+      {pendingRequests.length > 0 && (
+        <SidebarGroup>
+          <SidebarGroupLabel>Friend Requests</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {pendingRequests.map(request => (
+                <FriendRequestItem
+                  key={request.id}
+                  request={request}
+                  onAccept={handleAcceptRequest}
+                  onDelete={handleDeleteRequest}
+                />
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      )}
+
       <SidebarGroup>
+        <SidebarGroupLabel>Friends</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
             {friends && friends.map(chat => (

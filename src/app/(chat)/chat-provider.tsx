@@ -165,16 +165,18 @@ export function ChatProvider({children}: { children: React.ReactNode }) {
         }
     };
 
-    const updateConversationWithMessage = (message: Message) => {
+    const updateConversationWithMessage = async (message: Message) => {
+        const existingConversation = conversations.find(
+            conv => conv.friendUsername === message.sender || conv.friendUsername === message.receiver
+        );
+
+        if (!existingConversation) {
+            // Reload conversations to get the new one with proper friend info
+            await loadConversations();
+            return;
+        }
+
         setConversations(prev => {
-            const existingConversation = prev.find(
-                conv => conv.friendUsername === message.sender || conv.friendUsername === message.receiver
-            );
-
-            if (!existingConversation) {
-                return prev
-            }
-
             const updatedConversation =  {
                 ...existingConversation,
                 latestMessage: {

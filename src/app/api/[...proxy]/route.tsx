@@ -21,16 +21,27 @@ async function handler(request: NextRequest) {
 
     const backendUrl = process.env.REACT_APP_BACKEND_URL
     const url = request.nextUrl.href.replace(`${request.nextUrl.origin}/api`, backendUrl ?? request.nextUrl.origin)
-    const result = await fetch(url, { headers, body: request.body })
+    
+    try {
+        const result = await fetch(url, { 
+            method: request.method,
+            headers, 
+            body: request.body,
+            duplex: 'half'
+        } as never)
 
-    // Only strip content encoding in production
-    if (process.env.NODE_ENV === 'production') {
-        return stripContentEncoding(result)
+        // Only strip content encoding in production
+        if (process.env.NODE_ENV === 'production') {
+            return stripContentEncoding(result)
+        }
+
+        return result
+    } catch (err) {
+        console.error(err)
+        throw err
     }
-
-    return result
 }
 
 export const dynamic = "force-dynamic"
 
-export { handler as GET, handler as POST, handler as PUT, handler as DELETE, handler as PATCH }
+export { handler as GET, handler as POST, handler as PATCH, handler as PUT, handler as DELETE }

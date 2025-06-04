@@ -10,7 +10,6 @@
 import {ChatHeader} from "@/components/chat-header";
 import {useSidebar} from "@/components/ui/sidebar";
 import {useChat} from "@/app/(chat)/chat-provider";
-import {DialogNewChat} from "@/components/dialog-new-chat";
 import React from "react";
 import Link from "next/link";
 
@@ -46,7 +45,6 @@ export default function Page() {
   //   models.find((model) => model.id === modelIdFromCookie)?.id ||
   //   DEFAULT_MODEL_NAME;
   const {isMobile} = useSidebar();
-  const [newChatDialogOpen, setNewChatDialogOpen] = React.useState(false);
   const { conversations, loadConversations } = useChat();
 
   React.useEffect(() => {
@@ -56,20 +54,27 @@ export default function Page() {
   if (!conversations || conversations.length === 0) {
     return (
       <>
-        <ChatHeader name="Chats" isConnected={false}/>
-        <div className="flex-1">
-          <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
-            Your conversations will appear here once you start chatting!
-          </div>
-        </div>
-        <DialogNewChat open={newChatDialogOpen} setOpen={setNewChatDialogOpen} />
+        {isMobile && <ChatHeader name="Chats" isConnected={false}/>}
+        {isMobile ? (
+            <div className="flex-1">
+                <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
+                    Your conversations will appear here once you start chatting!
+                </div>
+            </div>
+        ) : (
+            <div className="flex-1 flex items-center justify-center">
+               <div className="text-4xl font-medium text-gray-200">
+                    MicroChat
+                </div>
+            </div>
+        )}
       </>
     );
   }
 
   return (
     <>
-      <ChatHeader name="Chats" isConnected={false}/>
+      {isMobile && <ChatHeader name="Chats" isConnected={false}/>}
       {isMobile ? (
         <div className="flex-1">
           <div className="flex flex-col">
@@ -120,7 +125,6 @@ export default function Page() {
           </div>
         </div>
       )}
-      <DialogNewChat open={newChatDialogOpen} setOpen={setNewChatDialogOpen} />
     </>
   );
 }

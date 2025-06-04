@@ -15,7 +15,6 @@ import {getInitials} from "@/lib/utils";
 import useSWR from "swr";
 import {fetcher} from "@/lib/utils";
 import {Friend} from "@/lib/types";
-import {DialogNewFriend} from "@/components/dialog-add-friend";
 import React from "react";
 
 // export default async function Page(props: { params: Promise<{ id: string }> }) {
@@ -51,7 +50,6 @@ export default function Page() {
   //   DEFAULT_MODEL_NAME;
 
   const {isMobile} = useSidebar();
-  const [newFriendDialogOpen, setNewFriendDialogOpen] = React.useState(false);
   const {
     data: friends,
     isLoading,
@@ -59,11 +57,12 @@ export default function Page() {
   } = useSWR<Array<Friend>>('/api/friends', fetcher, {
     fallbackData: [],
   });
+  
 
   if (isLoading) {
     return (
       <>
-        <ChatHeader name="Friends" isConnected={false}/>
+        {isMobile && <ChatHeader name="Friends" isConnected={false}/>}
         <div className="flex-1">
           <div className="flex flex-col">
             {[44, 32, 28, 64, 52].map((item) => (
@@ -90,20 +89,27 @@ export default function Page() {
   if (friends?.length === 0) {
     return (
       <>
-        <ChatHeader name="Friends" isConnected={false}/>
-        <div className="flex-1">
-          <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
-            Add a friend to start chatting!
+        {isMobile && <ChatHeader name="Friends" isConnected={false}/>}
+        {isMobile ? (
+          <div className="flex-1">
+            <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
+              Add a friend to start chatting!
+            </div>
           </div>
-        </div>
-        <DialogNewFriend open={newFriendDialogOpen} setOpen={setNewFriendDialogOpen} />
+        ) : (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-4xl font-medium text-gray-200">
+              MicroChat
+            </div>
+          </div>
+        )}
       </>
     );
   }
 
   return (
     <>
-      <ChatHeader name="Friends" isConnected={false}/>
+      {isMobile && <ChatHeader name="Friends" isConnected={false}/>}
       {isMobile ? (
         <div className="flex-1">
           <div className="flex flex-col">
@@ -128,7 +134,6 @@ export default function Page() {
           </div>
         </div>
       )}
-      <DialogNewFriend open={newFriendDialogOpen} setOpen={setNewFriendDialogOpen} />
     </>
   );
 }
